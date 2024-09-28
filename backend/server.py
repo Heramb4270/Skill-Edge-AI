@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import google.generativeai as genai
 from flask_cors import CORS
 from dotenv import load_dotenv
- # Assuming this is the function that interacts with Gemini SDK
+import json
 import os
 
 app = Flask(__name__)
@@ -15,28 +15,56 @@ load_dotenv()
 def hello_world():
     return 'Server is running!'
 
-
 # Function to use Gemini SDK to generate MCQs
 def generate_mcqs_with_gemini(topic, no_q, difficulty):
-    # Get the API key from environment variables
-    # api_key = os.getenv("GEMINI_API_KEY")  # Assuming GEMINI_API_KEY is set in your environment
-    
     # Configure the API key properly
-    genai.configure(api_key="")
+    api_key = "AIzaSyCOdDy6L2bW8t4a1zTBC8RXSJ6g32WG5kg"  # Ensure the API key is set in the environment
+    if not api_key:
+        return None, "API key is missing or not set."
     
-    # The rest of your code follows as normal...
-    prompt = f"Generate {no_q} MCQs on {topic} with {difficulty} difficulty."
+    genai.configure(api_key=api_key)
     
-    # Start chat and generate response using the Gemini model
+    # The prompt for the Gemini API
+    prompt = f"""Generate {no_q} MCQs on {topic} with {difficulty} difficulty. I want the JSON output in this format: {{
+    "total_marks": 100,
+    "optained_marks": 80,
+    "questions": [
+        {{
+            "qno": "Q.1) A",
+            "question": "What is Operating System?",
+            "student_answer": "The Operating System is core of the System",
+            "correct_answer": "Operating System is a software that acts as an interface between user and hardware.",
+            "total_marks": 10,
+            "optained_marks": 5,
+            "remarks": "Missing some points like not mentioning it is a system software or interface between user and hardware"
+        }},
+        {{
+            "qno": "Q.1) B",
+            "question": "Select a Mobile  Operating System.",
+            "student_answer": "Windows, Linux, Unix, Mac",
+            "correct_answer": "Android,",
+            "total_marks": 10,
+            "optained_marks": 10,
+            "remarks": "Correct"
+        }}
+    ]
+}}"""
+    
+    # Generate response using the Gemini model
     model = genai.GenerativeModel(model_name="gemini-1.0-pro")
     convo = model.start_chat(history=[])
-    response = convo.send_message(prompt)
+    
+    try:
+        response = convo.send_message(prompt)
+    except Exception as e:
+        return None, f"Error communicating with the API: {str(e)}"
 
-    # Assuming the response contains generated MCQs
-    mcqs = response.text
-
-    return mcqs, None  # Return generated MCQs
-
+    # Log the raw response object for debugging
+    print(f"Response Object: {response}")
+    print(f"Response Text: {response.text}")  # Log the raw text
+    
+    return response.text, None
+    
 @app.route('/generate-mcqs', methods=['POST'])
 def generate_mcqs():
     data = request.get_json()
@@ -50,7 +78,7 @@ def generate_mcqs():
     if error:
         return jsonify({"error": error}), 500
 
-    return jsonify(mcqs)
+    return jsonify(mcqs)  # Return the properly formatted JSON response
 
 if __name__ == '__main__':
     app.run(debug=True)
