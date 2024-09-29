@@ -78,6 +78,28 @@ def generate_question_by_file():
 
     return jsonify(questions)
 
+@app.route('/generate_question_theory', methods=['POST'])
+def generate_question_theory():
+    data = request.json
+    topic = data['topic']
+    no_of_questions = data['no_of_questions']
+    difficulty = data['difficulty']
+
+    genai.configure(api_key=API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+
+    questions = model.generate_content(f"Generate {no_of_questions} thoery questions on {topic} with difficulty {difficulty}. Give me json output.  In the following format: \n\n[{{\n    \"qno\": 1,\n    \"question\": \"What is the capital of India?\",}},\n{{\n    \"qno\": 2,\n    \"question\": \"What is the capital of USA?\"}}]")
+
+    str = questions.text
+    str = str.replace('```json', '')
+    str = str.replace('```', '')
+    str = str.strip()
+    questions = json.loads(str)
+
+    print(questions)
+
+    return jsonify(questions)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
