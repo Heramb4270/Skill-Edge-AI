@@ -1,0 +1,112 @@
+[
+  {
+      "answer": "To control the hardware and software resources of a computer.",
+      "options": [
+          "To control the hardware and software resources of a computer.",
+          "To write and compile programs.",
+          "To create and manage databases.",
+          "To design and develop websites."
+      ],
+      "qno": 1,
+      "question": "What is the primary function of an operating system?"
+  },
+  {
+      "answer": "Database",
+      "options": [
+          "Desktop",
+          "Mobile",
+          "Server",
+          "Database"
+      ],
+      "qno": 2,
+      "question": "Which of the following is NOT a type of operating system?"
+  },
+  {
+      "answer": "A program that is currently running.",
+      "options": [
+          "A program that is currently running.",
+          "A collection of files.",
+          "A hardware component.",
+          "A type of network connection."
+      ],
+      "qno": 3,
+      "question": "What is a process in an operating system?"
+  },
+  {
+      "answer": "To organize and store files on a storage device.",
+      "options": [
+          "To organize and store files on a storage device.",
+          "To control network traffic.",
+          "To manage user accounts.",
+          "To run applications."
+      ],
+      "qno": 4,
+      "question": "What is the purpose of a file system?"
+  },
+  {
+      "answer": "A file is a collection of data, while a directory is a container for files.",
+      "options": [
+          "A file is a collection of data, while a directory is a container for files.",
+          "A file is a program, while a directory is a folder.",
+          "A file is a hardware component, while a directory is a software component.",
+          "There is no difference."
+      ],
+      "qno": 5,
+      "question": "What is the difference between a file and a directory?"
+  },
+  {
+      "answer": "To interact with the operating system using text commands.",
+      "options": [
+          "To interact with the operating system using text commands.",
+          "To create and edit graphical user interfaces.",
+          "To manage network connections.",
+          "To write and compile programs."
+      ],
+      "qno": 6,
+      "question": "What is the purpose of a command-line interface (CLI)?"
+  },
+  {
+      "answer": "A user interface that uses icons, menus, and windows to interact with the operating system.",
+      "options": [
+          "A user interface that uses icons, menus, and windows to interact with the operating system.",
+          "A type of programming language.",
+          "A network protocol.",
+          "A storage device."
+      ],
+      "qno": 7,
+      "question": "What is a graphical user interface (GUI)?"
+  },
+  {
+      "answer": "The ability of an operating system to run multiple programs at the same time.",
+      "options": [
+          "The ability of an operating system to run multiple programs at the same time.",
+          "The process of creating a new user account.",
+          "A type of network connection.",
+          "A storage device."
+      ],
+      "qno": 8,
+      "question": "What is multitasking?"
+  },
+  {
+      "answer": "To manage the allocation of memory to processes.",
+      "options": [
+          "To manage the allocation of memory to processes.",
+          "To control the input and output devices.",
+          "To perform arithmetic and logical operations.",
+          "To store data."
+      ],
+      "qno": 9,
+      "question": "What is the purpose of a memory management unit (MMU)?"
+  },
+  {
+      "answer": "A software-based emulation of a physical computer.",
+      "options": [
+          "A software-based emulation of a physical computer.",
+          "A type of network connection.",
+          "A programming language.",
+          "A storage device."
+      ],
+      "qno": 10,
+      "question": "What is a virtual machine?"
+  }
+]
