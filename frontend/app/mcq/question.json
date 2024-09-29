@@ -1,139 +1,112 @@
-{
-  "questions": [
-    {
-      "question": "Which is the most popular JavaScript framework?",
-      "options": ["Angular", "React", "Svelte", "Vue"],
-      "correctOption": 1,
-      "points": 10
-    },
-    {
-      "question": "Which company invented React?",
-      "options": ["Google", "Apple", "Netflix", "Facebook"],
-      "correctOption": 3,
-      "points": 10
-    },
-    {
-      "question": "What's the fundamental building block of React apps?",
-      "options": ["Components", "Blocks", "Elements", "Effects"],
-      "correctOption": 0,
-      "points": 10
-    },
-    {
-      "question": "What's the name of the syntax we use to describe the UI in React components?",
-      "options": ["FBJ", "Babel", "JSX", "ES2015"],
-      "correctOption": 2,
-      "points": 10
-    },
-    {
-      "question": "How does data flow naturally in React apps?",
+[
+  {
+      "answer": "To control the hardware and software resources of a computer.",
       "options": [
-        "From parents to children",
-        "From children to parents",
-        "Both ways",
-        "The developers decides"
+          "To control the hardware and software resources of a computer.",
+          "To write and compile programs.",
+          "To create and manage databases.",
+          "To design and develop websites."
       ],
-      "correctOption": 0,
-      "points": 10
-    },
-    {
-      "question": "How to pass data into a child component?",
-      "options": ["State", "Props", "PropTypes", "Parameters"],
-      "correctOption": 1,
-      "points": 10
-    },
-    {
-      "question": "When to use derived state?",
+      "qno": 1,
+      "question": "What is the primary function of an operating system?"
+  },
+  {
+      "answer": "Database",
       "options": [
-        "Whenever the state should not trigger a re-render",
-        "Whenever the state can be synchronized with an effect",
-        "Whenever the state should be accessible to all components",
-        "Whenever the state can be computed from another state variable"
+          "Desktop",
+          "Mobile",
+          "Server",
+          "Database"
       ],
-      "correctOption": 3,
-      "points": 30
-    },
-    {
-      "question": "What triggers a UI re-render in React?",
+      "qno": 2,
+      "question": "Which of the following is NOT a type of operating system?"
+  },
+  {
+      "answer": "A program that is currently running.",
       "options": [
-        "Running an effect",
-        "Passing props",
-        "Updating state",
-        "Adding event listeners to DOM elements"
+          "A program that is currently running.",
+          "A collection of files.",
+          "A hardware component.",
+          "A type of network connection."
       ],
-      "correctOption": 2,
-      "points": 20
-    },
-    {
-      "question": "When do we directly \"touch\" the DOM in React?",
+      "qno": 3,
+      "question": "What is a process in an operating system?"
+  },
+  {
+      "answer": "To organize and store files on a storage device.",
       "options": [
-        "When we need to listen to an event",
-        "When we need to change the UI",
-        "When we need to add styles",
-        "Almost never"
+          "To organize and store files on a storage device.",
+          "To control network traffic.",
+          "To manage user accounts.",
+          "To run applications."
       ],
-      "correctOption": 3,
-      "points": 20
-    },
-    {
-      "question": "In what situation do we use a callback to update state?",
+      "qno": 4,
+      "question": "What is the purpose of a file system?"
+  },
+  {
+      "answer": "A file is a collection of data, while a directory is a container for files.",
       "options": [
-        "When updating the state will be slow",
-        "When the updated state is very data-intensive",
-        "When the state update should happen faster",
-        "When the new state depends on the previous state"
+          "A file is a collection of data, while a directory is a container for files.",
+          "A file is a program, while a directory is a folder.",
+          "A file is a hardware component, while a directory is a software component.",
+          "There is no difference."
       ],
-      "correctOption": 3,
-      "points": 30
-    },
-    {
-      "question": "If we pass a function to useState, when will that function be called?",
+      "qno": 5,
+      "question": "What is the difference between a file and a directory?"
+  },
+  {
+      "answer": "To interact with the operating system using text commands.",
       "options": [
-        "On each re-render",
-        "Each time we update the state",
-        "Only on the initial render",
-        "The first time we update the state"
+          "To interact with the operating system using text commands.",
+          "To create and edit graphical user interfaces.",
+          "To manage network connections.",
+          "To write and compile programs."
       ],
-      "correctOption": 2,
-      "points": 30
-    },
-    {
-      "question": "Which hook to use for an API request on the component's initial render?",
-      "options": ["useState", "useEffect", "useRef", "useReducer"],
-      "correctOption": 1,
-      "points": 10
-    },
-    {
-      "question": "Which variables should go into the useEffect dependency array?",
+      "qno": 6,
+      "question": "What is the purpose of a command-line interface (CLI)?"
+  },
+  {
+      "answer": "A user interface that uses icons, menus, and windows to interact with the operating system.",
       "options": [
-        "Usually none",
-        "All our state variables",
-        "All state and props referenced in the effect",
-        "All variables needed for clean up"
+          "A user interface that uses icons, menus, and windows to interact with the operating system.",
+          "A type of programming language.",
+          "A network protocol.",
+          "A storage device."
       ],
-      "correctOption": 2,
-      "points": 30
-    },
-    {
-      "question": "An effect will always run on the initial render.",
+      "qno": 7,
+      "question": "What is a graphical user interface (GUI)?"
+  },
+  {
+      "answer": "The ability of an operating system to run multiple programs at the same time.",
       "options": [
-        "True",
-        "It depends on the dependency array",
-        "False",
-        "In depends on the code in the effect"
+          "The ability of an operating system to run multiple programs at the same time.",
+          "The process of creating a new user account.",
+          "A type of network connection.",
+          "A storage device."
       ],
-      "correctOption": 0,
-      "points": 30
-    },
-    {
-      "question": "When will an effect run if it doesn't have a dependency array?",
+      "qno": 8,
+      "question": "What is multitasking?"
+  },
+  {
+      "answer": "To manage the allocation of memory to processes.",
       "options": [
-        "Only when the component mounts",
-        "Only when the component unmounts",
-        "The first time the component re-renders",
-        "Each time the component is re-rendered"
+          "To manage the allocation of memory to processes.",
+          "To control the input and output devices.",
+          "To perform arithmetic and logical operations.",
+          "To store data."
       ],
-      "correctOption": 3,
-      "points": 20
-    }
-  ]
-}
+      "qno": 9,
+      "question": "What is the purpose of a memory management unit (MMU)?"
+  },
+  {
+      "answer": "A software-based emulation of a physical computer.",
+      "options": [
+          "A software-based emulation of a physical computer.",
+          "A type of network connection.",
+          "A programming language.",
+          "A storage device."
+      ],
+      "qno": 10,
+      "question": "What is a virtual machine?"
+  }
+]
