@@ -3,6 +3,7 @@ import { useState } from "react";
 import { MdGeneratingTokens } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
+import { SiTableau } from "react-icons/si";
 
 export default function GenerateQuestion() {
     const [topic, setTopic] = useState("");
@@ -98,10 +99,31 @@ export default function GenerateQuestion() {
                             Using File
                         </a>
                     </li>
+                    <li className="me-2">
+                        <a
+                            href="#"
+                            className={`inline-flex items-center justify-center p-4 border-b-2 ${
+                                tab === "multi-topic"
+                                    ? "text-orange-600 border-orange-600 dark:text-orange-500 dark:border-orange-500"
+                                    : "border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 "
+                            } rounded-t-lg group`}
+                            aria-current="page"
+                            onClick={() => setTab("multi-topic")}
+                        >
+                            <SiTableau
+                                className={`w-5 h-5 me-2 ${
+                                    tab === "multi-topic"
+                                        ? "text-orange-600 dark:text-orange-500"
+                                        : "text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300"
+                                }`}
+                            />
+                            Multiple Topics
+                        </a>
+                    </li>
                 </ul>
             </div>
 
-            {tab === "prompt" ? (
+            {tab === "prompt" && (
                 <div className="mb-3">
                     <label
                         htmlFor="message"
@@ -118,7 +140,8 @@ export default function GenerateQuestion() {
                         onChange={(e) => setTopic(e.target.value)}
                     ></textarea>
                 </div>
-            ) : (
+            )}
+            {tab === "file" && (
                 <>
                     <div class="flex items-center justify-center w-full mb-3">
                         <label
@@ -181,26 +204,36 @@ export default function GenerateQuestion() {
                 </>
             )}
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {tab === "multi-topic" && (
+                <div className="mb-3">Yet to implement</div>
+            )}
+            
+            <div className={tab !== "multi-topic" ? "grid grid-cols-1 gap-6 md:grid-cols-2" : ""}>
+                
+                {tab !== "multi-topic" && (
+                    <div className="mb-3">
+                        <label
+                            htmlFor="number-input"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                            Select number of questions
+                        </label>
+                        <input
+                            type="number"
+                            id="number-input"
+                            aria-describedby="helper-text-explanation"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
+                            placeholder="Enter number of questions"
+                            value={numberOfQuestions}
+                            onChange={(e) =>
+                                setNumberOfQuestions(e.target.value)
+                            }
+                            required
+                        />
+                    </div>
+                )}
+
                 <div className="mb-3">
-                    <label
-                        htmlFor="number-input"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                        Select number of questions
-                    </label>
-                    <input
-                        type="number"
-                        id="number-input"
-                        aria-describedby="helper-text-explanation"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
-                        placeholder="Enter number of questions"
-                        value={numberOfQuestions}
-                        onChange={(e) => setNumberOfQuestions(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
                     <label
                         htmlFor="difficulty-level"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"

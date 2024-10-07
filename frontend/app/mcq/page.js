@@ -19,8 +19,8 @@ const QuizPage = () => {
 
   const handleNextQuestion = () => {
     if (selectedAnswer !== null) {
-      if (selectedAnswer === questions[currentQuestionIndex].correctAnswer) {
-        setScore(score + 1);
+      if (selectedAnswer.includes(questions[currentQuestionIndex].answer)) {
+        setScore((score)=>score + 1);
       }
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
@@ -57,7 +57,7 @@ const QuizPage = () => {
             onNext={handleNextQuestion}
           />
         ) : (
-          <QuizResult score={score} total={questions.length} />
+          <QuizResult score2={score} total={questions.length} />
         )}
       </div>
     </div>
@@ -125,7 +125,7 @@ const QuizQuestion = ({
                   ? 'border-yellow-400 bg-gray-700' 
                   : 'border-gray-700 bg-gray-750 hover:bg-gray-700'
               } focus:outline-none focus:ring-2 focus:ring-yellow-400 transition duration-150 ease-in-out flex items-center`}
-              onClick={() => setSelectedAnswer(index)}
+              onClick={() => setSelectedAnswer(option)}
             >
               <span className="text-yellow-400 font-semibold mr-2">{String.fromCharCode(65 + index)}.</span>
               {option}
@@ -146,13 +146,13 @@ const QuizQuestion = ({
   };
   
 
-const QuizResult = ({ score, total }) => {
+const QuizResult = ({ score2, total }) => {
   return (
     <div className="bg-gray-800 shadow-lg rounded-lg p-6 text-center flex-grow flex flex-col justify-center">
       <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
-      <p className="text-lg mb-4">Your score: {score} out of {total}</p>
+      <p className="text-lg mb-4">Your score: {score2} out of {total}</p>
       <p className="text-yellow-400 text-xl font-semibold mb-6">
-        {score === total ? "Perfect Score!" : score > total / 2 ? "Great Job!" : "Keep Practicing!"}
+        {score2 === total ? "Perfect Score!" : score2 > total / 2 ? "Great Job!" : "Keep Practicing!"}
       </p>
       <button className="bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ease-in-out mx-auto">
         Restart Quiz
