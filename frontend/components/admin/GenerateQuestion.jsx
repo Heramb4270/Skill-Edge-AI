@@ -73,7 +73,7 @@ export default function GenerateQuestion() {
                 }
             } else if (tab === "file") {
                 const formData = new FormData();
-                formData.append("file", image);
+                formData.append("file", file);
                 formData.append("topic", topic);
                 formData.append("no_of_questions", numberOfQuestions);
                 formData.append("difficulty", difficultyLevel);
