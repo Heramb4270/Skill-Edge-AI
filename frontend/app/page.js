@@ -1,7 +1,6 @@
 "use client";
 import Card from "@/components/Card";
 import Footer from "@/components/Footer";
-import GetCertificateButton from "@/components/GetCertificateButton";
 import IntoBanner from "@/components/IntroBanner";
 // import NavBar from "@/components/user/Navbar";
 import Navbar from "@/components/user/navbar";
