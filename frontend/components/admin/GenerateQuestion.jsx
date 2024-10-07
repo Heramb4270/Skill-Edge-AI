@@ -3,6 +3,7 @@ import { useState } from "react";
 import { MdGeneratingTokens } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
+import { SiTableau } from "react-icons/si";
 
 export default function GenerateQuestion() {
     const [topic, setTopic] = useState("");
@@ -98,10 +99,31 @@ export default function GenerateQuestion() {
                             Using File
                         </a>
                     </li>
+                    <li className="me-2">
+                        <a
+                            href="#"
+                            className={`inline-flex items-center justify-center p-4 border-b-2 ${
+                                tab === "multi-topic"
+                                    ? "text-orange-600 border-orange-600 dark:text-orange-500 dark:border-orange-500"
+                                    : "border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 "
+                            } rounded-t-lg group`}
+                            aria-current="page"
+                            onClick={() => setTab("multi-topic")}
+                        >
+                            <SiTableau
+                                className={`w-5 h-5 me-2 ${
+                                    tab === "multi-topic"
+                                        ? "text-orange-600 dark:text-orange-500"
+                                        : "text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300"
+                                }`}
+                            />
+                            Multiple Topics
+                        </a>
+                    </li>
                 </ul>
             </div>
 
-            {tab === "prompt" ? (
+            {tab === "prompt" && (
                 <div className="mb-3">
                     <label
                         htmlFor="message"
@@ -118,43 +140,100 @@ export default function GenerateQuestion() {
                         onChange={(e) => setTopic(e.target.value)}
                     ></textarea>
                 </div>
-            ) : (
-                <div className="mb-4">
-                    <label
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                        htmlFor="file_input"
-                    >
-                        Upload Syllabus/Reference
-                    </label>
-                    <input
-                        id="file_input"
-                        type="file"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
-                        onChange={(e) => setFile(e.target.files[0])}
-                    />
-                </div>
+            )}
+            {tab === "file" && (
+                <>
+                    <div class="flex items-center justify-center w-full mb-3">
+                        <label
+                            for="dropzone-file"
+                            class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                        >
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <svg
+                                    class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 20 16"
+                                >
+                                    <path
+                                        stroke="currentColor"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                                    />
+                                </svg>
+                                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                    <span class="font-semibold">
+                                        Click to upload
+                                    </span>{" "}
+                                    or drag and drop
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    {file?.name ||
+                                        "SVG, PNG, JPG or GIF (MAX. 800x400px)"}
+                                </p>
+                            </div>
+                            <input
+                                id="dropzone-file"
+                                type="file"
+                                class="hidden"
+                                onChange={(e) => setFile(e.target.files[0])}
+                            />
+                        </label>
+                    </div>
+
+                    {/* Input prompt for file */}
+                    <div className="mb-3">
+                        <label
+                            htmlFor="message"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                            Description
+                        </label>
+                        <textarea
+                            id="message"
+                            rows="4"
+                            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
+                            placeholder="Write the description here"
+                            value={topic}
+                            onChange={(e) => setTopic(e.target.value)}
+                        ></textarea>
+                    </div>
+                </>
             )}
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {tab === "multi-topic" && (
+                <div className="mb-3">Yet to implement</div>
+            )}
+            
+            <div className={tab !== "multi-topic" ? "grid grid-cols-1 gap-6 md:grid-cols-2" : ""}>
+                
+                {tab !== "multi-topic" && (
+                    <div className="mb-3">
+                        <label
+                            htmlFor="number-input"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                            Select number of questions
+                        </label>
+                        <input
+                            type="number"
+                            id="number-input"
+                            aria-describedby="helper-text-explanation"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
+                            placeholder="Enter number of questions"
+                            value={numberOfQuestions}
+                            onChange={(e) =>
+                                setNumberOfQuestions(e.target.value)
+                            }
+                            required
+                        />
+                    </div>
+                )}
+
                 <div className="mb-3">
-                    <label
-                        htmlFor="number-input"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                        Select number of questions
-                    </label>
-                    <input
-                        type="number"
-                        id="number-input"
-                        aria-describedby="helper-text-explanation"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
-                        placeholder="Enter number of questions"
-                        value={numberOfQuestions}
-                        onChange={(e) => setNumberOfQuestions(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
                     <label
                         htmlFor="difficulty-level"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
