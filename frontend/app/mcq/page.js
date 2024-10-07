@@ -1,15 +1,45 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { CodeXml, Timer, ChevronRight } from 'lucide-react';
-
+import {QuizAnalysis} from "@/components/QuizAnalysis";
+import { db } from '@/firebase/firebase'; // Adjust the path as needed
+import { collection, getDocs } from 'firebase/firestore';
 const questions = require("@/app/mcq/question.json");
 
+import { useRouter } from 'next/navigation';
 const QuizPage = () => {
+  const [data, setData] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(1200);
+  const [questionsCorrect, setQuestionsCorrect] = useState([]);
 
+
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, 'quizzes')); 
+            const fetchedData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setData(fetchedData);
+            console.log(fetchedData);
+        } catch (err) {
+            console.error(err);
+        } 
+    };
+
+    fetchData();
+}, []);
+  const handleRestartQuiz = () => {
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setScore(0);
+    setQuestionsCorrect([]);
+    setTimeRemaining(1200);
+    window.location.reload();
+
+    
+  }
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
@@ -21,6 +51,7 @@ const QuizPage = () => {
     if (selectedAnswer !== null) {
       if (selectedAnswer.includes(questions[currentQuestionIndex].answer)) {
         setScore((score)=>score + 1);
+        setQuestionsCorrect((questionsCorrect) => [...questionsCorrect, currentQuestionIndex]);
       }
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
@@ -44,7 +75,7 @@ const QuizPage = () => {
           time={formatTime(timeRemaining)}
         />
         <QuizProgress 
-          current={currentQuestionIndex + 1} 
+          current={currentQuestionIndex } 
           total={questions.length}
         />
         {currentQuestionIndex < questions.length ? (
@@ -55,9 +86,10 @@ const QuizPage = () => {
             selectedAnswer={selectedAnswer}
             setSelectedAnswer={setSelectedAnswer}
             onNext={handleNextQuestion}
+            
           />
         ) : (
-          <QuizResult score2={score} total={questions.length} />
+          <QuizResult questionsCorrect={questionsCorrect}score2={score} total={questions.length} restartQuiz={handleRestartQuiz}/>
         )}
       </div>
     </div>
@@ -146,16 +178,28 @@ const QuizQuestion = ({
   };
   
 
-const QuizResult = ({ score2, total }) => {
+const QuizResult = ({ score2, total,questionsCorrect,restartQuiz }) => {
+  const router = useRouter();
+  const handleAnalysis = () => {
+    <QuizAnalysis />
+  }
   return (
     <div className="bg-gray-800 shadow-lg rounded-lg p-6 text-center flex-grow flex flex-col justify-center">
       <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
       <p className="text-lg mb-4">Your score: {score2} out of {total}</p>
       <p className="text-yellow-400 text-xl font-semibold mb-6">
-        {score2 === total ? "Perfect Score!" : score2 > total / 2 ? "Great Job!" : "Keep Practicing!"}
+        {score2 === total ? "Perfect Score!" : score2 > total / 2 ? "Great Job!" : `Keep Practicing!`}
+        
       </p>
-      <button className="bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ease-in-out mx-auto">
+      <p className="text-gray-100 text-sm mb-6">Correct Questions are {questionsCorrect.map((question) => question).join(",")}</p>
+      <p className="text-gray-100 text-sm mb-6">Incorrect Correct Questions are {questions.map((question,index)=>{console.log("Incorrect Questions ",index); return (index!=questionsCorrect.map(index=>{console.log(index);return index }))?index:""}).join(" ")}</p>
+      <button className="bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ease-in-out mx-auto"
+      onClick={restartQuiz}>
         Restart Quiz
+      </button>
+      <button className="bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ease-in-out mx-auto"
+      onClick={router.push("/quiz-analysis")}>
+        View Analysis
       </button>
     </div>
   );
