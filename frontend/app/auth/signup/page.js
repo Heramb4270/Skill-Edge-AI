@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { firestore } from '@/firebase/firebase'; // import firestore configuration
 import { collection, addDoc } from 'firebase/firestore'; // For Firestore database
-import Router from 'next/router';``
+import Router from 'next/router';import Link from 'next/link';
+``
 
 export default function Page() {
   const [formData, setFormData] = useState({
@@ -180,9 +181,9 @@ export default function Page() {
                 </button>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Already have an account?{' '}
-                  <a href="/auth/login" className="font-medium text-orange-600 hover:underline dark:text-orange-500">
+                  <Link href="/auth/login" className="font-medium text-orange-600 hover:underline dark:text-orange-500">
                     Login
-                  </a>
+                  </Link>
                 </p>
               </form>
             </div>
