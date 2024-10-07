@@ -17,34 +17,106 @@ export default function GenerateQuestion() {
     const [questions, setQuestions] = useState([]);
 
     const [tab, setTab] = useState("prompt");
+    const [topics, setTopics] = useState([
+        { topicName: "", numberOfQuestions: "" },
+    ]);
+
+    // Function to handle adding a new topic
+    const handleAddTopic = () => {
+        setTopics([...topics, { topicName: "", numberOfQuestions: "" }]);
+    };
+
+    // Function to handle input changes for topic name and number of questions
+    const handleInputChange = (index, field, value) => {
+        const updatedTopics = topics.map((topic, i) =>
+            i === index ? { ...topic, [field]: value } : topic
+        );
+        setTopics(updatedTopics);
+    };
 
     const handleGenerateQuestions = async () => {
         setLoading(true);
         setError(null);
 
         try {
-            const response = await fetch(
-                "http://localhost:5000/generate_question",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        topic,
-                        no_of_questions: numberOfQuestions,
-                        difficulty: difficultyLevel,
-                    }),
+            if (tab === "multi-topic") {
+                // Prepare the request payload
+                const requestBody = {
+                    topics: topics.map((topic) => ({
+                        topicName: topic.topicName, // Topic name from each topic entry
+                        numberOfQuestions: topic.numberOfQuestions, // Number of questions from each topic entry
+                    })),
+                    difficultyLevel, // Assuming difficultyLevel is available in your state
+                };
+
+                try {
+                    const response = await fetch(
+                        "http://localhost:5000/generate_question_topics",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(requestBody),
+                        }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error("Failed to generate questions.");
+                    }
+
+                    const data = await response.json();
+                    setQuestions(data); // Assuming you have setQuestions in your state
+                    return;
+                } catch (error) {
+                    console.error(error.message);
                 }
-            );
+            } else if (tab === "file") {
+                const formData = new FormData();
+                formData.append("file", image);
+                formData.append("topic", topic);
+                formData.append("no_of_questions", numberOfQuestions);
+                formData.append("difficulty", difficultyLevel);
 
-            if (!response.ok) {
-                throw new Error("Failed to generate questions.");
+                const response = await fetch(
+                    "http://localhost:5000/generate_question_by_file",
+                    {
+                        method: "POST",
+                        body: formData, // No need for JSON.stringify, FormData handles this
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to generate questions.");
+                }
+
+                const data = await response.json();
+                setQuestions(data);
+                return;
+            } else if (tab === "prompt") {
+                const response = await fetch(
+                    "http://localhost:5000/generate_question",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            topic,
+                            no_of_questions: numberOfQuestions,
+                            difficulty: difficultyLevel,
+                        }),
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to generate questions.");
+                }
+
+                const data = await response.json();
+                console.log(data);
+                setQuestions(data);
             }
-
-            const data = await response.json();
-            console.log(data);
-            setQuestions(data);
         } catch (error) {
             setError(error.message);
         } finally {
@@ -210,7 +282,71 @@ export default function GenerateQuestion() {
             )}
 
             {tab === "multi-topic" && (
-                <div className="mb-3">Yet to implement</div>
+                <div className="mb-3">
+                    {topics.map((topic, index) => (
+                        <div
+                            key={index}
+                            className="grid grid-cols-1 gap-6 md:grid-cols-2 mb-3"
+                        >
+                            <div>
+                                <label
+                                    htmlFor={`topic-input-${index}`}
+                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                >
+                                    Topic Name
+                                </label>
+                                <input
+                                    type="text"
+                                    id={`topic-input-${index}`}
+                                    aria-describedby="helper-text-explanation"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
+                                    placeholder="Enter Topic Name"
+                                    value={topic.topicName}
+                                    onChange={(e) =>
+                                        handleInputChange(
+                                            index,
+                                            "topicName",
+                                            e.target.value
+                                        )
+                                    }
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor={`number-input-${index}`}
+                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                >
+                                    Select number of questions
+                                </label>
+                                <input
+                                    type="number"
+                                    id={`number-input-${index}`}
+                                    aria-describedby="helper-text-explanation"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
+                                    placeholder="Enter number of questions"
+                                    value={topic.numberOfQuestions}
+                                    onChange={(e) =>
+                                        handleInputChange(
+                                            index,
+                                            "numberOfQuestions",
+                                            e.target.value
+                                        )
+                                    }
+                                    required
+                                />
+                            </div>
+                        </div>
+                    ))}
+
+                    <button
+                        type="button"
+                        onClick={handleAddTopic}
+                        className="bg-orange-500 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
+                        Add Topic
+                    </button>
+                </div>
             )}
 
             <div
