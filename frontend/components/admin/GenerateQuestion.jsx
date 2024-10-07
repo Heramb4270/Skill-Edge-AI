@@ -4,6 +4,8 @@ import { MdGeneratingTokens } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 import { SiTableau } from "react-icons/si";
+import DisplayQuestions from "./DisplayQuestions";
+import { Toaster } from "react-hot-toast";
 
 export default function GenerateQuestion() {
     const [topic, setTopic] = useState("");
@@ -12,7 +14,8 @@ export default function GenerateQuestion() {
     const [file, setFile] = useState(null); // If needed for the file upload option
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [questions, setQuestions] = useState([]); // To store the questions
+    const [questions, setQuestions] = useState([]);
+
     const [tab, setTab] = useState("prompt");
 
     const handleGenerateQuestions = async () => {
@@ -40,6 +43,7 @@ export default function GenerateQuestion() {
             }
 
             const data = await response.json();
+            console.log(data);
             setQuestions(data);
         } catch (error) {
             setError(error.message);
@@ -55,6 +59,7 @@ export default function GenerateQuestion() {
                 Generate questions based on the topic you provide or upload a
                 file containing the syllabus or reference.
             </p>
+            <Toaster />
 
             <div className="border-b border-gray-200 dark:border-gray-700 mb-4">
                 <ul className="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
@@ -207,9 +212,14 @@ export default function GenerateQuestion() {
             {tab === "multi-topic" && (
                 <div className="mb-3">Yet to implement</div>
             )}
-            
-            <div className={tab !== "multi-topic" ? "grid grid-cols-1 gap-6 md:grid-cols-2" : ""}>
-                
+
+            <div
+                className={
+                    tab !== "multi-topic"
+                        ? "grid grid-cols-1 gap-6 md:grid-cols-2"
+                        : ""
+                }
+            >
                 {tab !== "multi-topic" && (
                     <div className="mb-3">
                         <label
@@ -271,29 +281,15 @@ export default function GenerateQuestion() {
 
             {/* Display Questions */}
             {error && <div className="text-red-500">{error}</div>}
+
             {questions.length > 0 && (
-                <div className="mt-5">
-                    <h2 className="text-xl font-bold mb-4">
-                        Generated Questions:
-                    </h2>
-                    <ul className="list-decimal list-inside">
-                        {questions.map((question, index) => (
-                            <li key={index}>
-                                <p className="font-medium">
-                                    {question.question}
-                                </p>
-                                <ul className="list-disc list-inside pl-5">
-                                    {question.options.map((option, i) => (
-                                        <li key={i}>{option}</li>
-                                    ))}
-                                </ul>
-                                <p className="text-green-600">
-                                    Answer: {question.answer}
-                                </p>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                <>
+                    <hr className="mt-4 border-gray-200 dark:border-gray-700" />
+                    <DisplayQuestions
+                        questions={questions}
+                        setQuestions={setQuestions}
+                    />
+                </>
             )}
         </div>
     );
