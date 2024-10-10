@@ -84,8 +84,10 @@ def analyzequiz():
     incorrect_questions = {incorrect}
     no_of_questions = {no_of_questions}
     ** Important ** Dont give Explaination and Important Note At All i am using this output to print the result in my app.
-
-""")
+    ** Important ** Everything should be in JSON format. either in single quotes or double quotes. dont highlight the title with double quotes in books .
+    for example "Artificial Intelligence: A Modern Approach" by Stuart Russell and Peter Norvig" should be in single quotes.
+    i should not get json error. while printing the output in my app.
+    """)
                             
     print(analysis.text)
     str = analysis.text
