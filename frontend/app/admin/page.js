@@ -5,6 +5,7 @@ import Dashboard from '@/components/admin/Dashboard'
 import GenerateQuestion from '@/components/admin/GenerateQuestion'
 import StudentList from '@/components/admin/StudentList'
 import Resource from '@/components/admin/Resource'
+import Quizzes from '@/components/admin/Quizzes';
 
 export default function page() {
   const [tab, setTab] = useState('dashboard')
@@ -15,6 +16,7 @@ export default function page() {
             {tab === 'generate' && <GenerateQuestion />}
             {tab === 'students' && <StudentList />}
             {tab === 'resource' && <Resource/>}
+            {tab === 'quizzes' && <Quizzes />}
         </SideBar>
     </div>
   )

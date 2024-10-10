@@ -1,54 +1,86 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 import { MdLibraryBooks } from "react-icons/md";
-
-// Dummy data for resources to show in cards
-const dummyResources = [
-  {
-    title: "Resource 1",
-    link: "https://example.com/resource1",
-    date: "2024-10-01",
-  },
-  {
-    title: "Resource 2",
-    link: "https://example.com/resource2",
-    date: "2024-10-02",
-  },
-  {
-    title: "Resource 3",
-    link: "https://example.com/resource3",
-    date: "2024-10-03",
-  },
-  {
-    title: "Resource 4",
-    link: "https://example.com/resource4",
-    date: "2024-10-04",
-  },
-  {
-    title: "Resource 5",
-    link: "https://example.com/resource5",
-    date: "2024-10-05",
-  },
-];
+import { db, storage } from "@/firebase/firebase"; // Import Firestore and Storage
+import { collection, addDoc, getDocs, serverTimestamp } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function UploadResources() {
   const [file, setFile] = useState(null);
   const [link, setLink] = useState("");
+  const [name, setName] = useState("");
   const [tab, setTab] = useState("upload");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [resources, setResources] = useState([]);
 
+  // Fetch resources from Firestore when "View" tab is clicked
+  useEffect(() => {
+    if (tab === "view") {
+      fetchResources();
+    }
+  }, [tab]);
+
+  // Handle file upload
   const handleFileUpload = (e) => {
     setFile(e.target.files[0]);
   };
 
-  const handleSubmitResource = () => {
+  // Fetch resources from Firestore
+  const fetchResources = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, "resources"));
+      const fetchedResources = querySnapshot.docs.map((doc) => doc.data());
+      setResources(fetchedResources);
+    } catch (error) {
+      console.error("Error fetching resources: ", error);
+    }
+    setLoading(false);
+  };
+
+  // Submit resource (either file or link)
+  const handleSubmitResource = async () => {
     setLoading(true);
     setError(null);
 
-    // Add your resource submission logic here
+    try {
+      // Check if both file and link are empty
+      if (!file && !link) {
+        setError("Please upload a file or provide a link.");
+        setLoading(false);
+        return;
+      }
+
+      let resourceUrl = link || null; // Store null if no link is provided
+      if (file) {
+        // If the user uploads a file, store it in Firebase Storage
+        const fileRef = ref(storage, `resources/${file.name}`);
+        await uploadBytes(fileRef, file);
+        resourceUrl = await getDownloadURL(fileRef); // Get the file URL after upload
+      }
+
+      // Store resource details in Firestore
+      await addDoc(collection(db, "resources"), {
+        name: name || file?.name,
+        link: link || null, // Store null if no link is provided
+        url: resourceUrl,
+        date: serverTimestamp(), // Use Firebase server timestamp
+      });
+
+      // Clear input fields
+      setFile(null);
+      setLink("");
+      setName("");
+      alert("Resource uploaded successfully.");
+      // Fetch updated resources
+      fetchResources();
+    } catch (error) {
+      setError("Failed to upload resource.");
+      console.error("Error uploading resource: ", error);
+    }
 
     setLoading(false);
   };
@@ -104,20 +136,20 @@ export default function UploadResources() {
 
       {tab === "upload" ? (
         <div>
-            {/* Resource Name Input */}
-            <div className="mb-4">
+          {/* Resource Name Input */}
+          <div className="mb-4">
             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            Resource Name
+              Resource Name
             </label>
             <input
-            type="url"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            placeholder="The resource name"
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
+              type="text"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="The resource name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
-            </div>
-      
+          </div>
+
           {/* File Upload */}
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -166,27 +198,42 @@ export default function UploadResources() {
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {/* Display resources in cards */}
-          {dummyResources.map((resource, index) => (
+          {resources.map((resource, index) => (
             <div
               key={index}
               className="p-4 bg-white dark:bg-gray-700 shadow-lg rounded-lg border border-gray-200 dark:border-gray-600"
             >
               <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
-                {resource.title}
+                {resource.name}
               </h3>
+              <a
+                href={resource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-block px-4 py-2 mt-2 mr-5 text-white ${
+                  resource.url ? "bg-orange-600 hover:bg-orange-700" : "bg-gray-400 cursor-not-allowed"
+                } rounded-md transition duration-300`}
+                onClick={resource.url ? null : (e) => e.preventDefault()}
+              >
+                {resource.url ? "Open Resource" : "Resource Not Available"}
+              </a>
               <a
                 href={resource.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-orange-600 hover:underline"
+                className={`inline-block px-4 py-2 mt-2 text-white ${
+                  resource.link ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
+                } rounded-md transition duration-300`}
+                onClick={resource.link ? null : (e) => e.preventDefault()}
               >
-                {resource.link}
+                {resource.link ? "Open Link" : "Link Not Available"}
               </a>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                Shared on: {resource.date}
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                Uploaded on: {resource.date?.toDate().toLocaleString()}
               </p>
             </div>
           ))}
+          {loading && <CgSpinner className="animate-spin mx-auto text-2xl" />}
         </div>
       )}
     </div>
