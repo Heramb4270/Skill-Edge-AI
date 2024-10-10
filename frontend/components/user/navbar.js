@@ -3,16 +3,12 @@ import React, { useState } from 'react';
 
 
 export default function Navbar() {
-
-
   // State to manage menu open/close
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   // Function to toggle the menu
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
   
   return (
     <div>

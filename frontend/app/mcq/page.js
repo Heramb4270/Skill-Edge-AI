@@ -2,30 +2,35 @@
 import React, { useState, useEffect } from 'react';
 import { CodeXml, Timer, ChevronRight } from 'lucide-react';
 import {QuizAnalysis} from "@/components/QuizAnalysis";
-import { db } from '@/firebase/firebase'; // Adjust the path as needed
-import { collection, getDocs } from 'firebase/firestore';
-const questions = require("@/app/mcq/question.json");
+import { db } from '@/firebase/db'; // Adjust the path as needed
+import { collection, getDocs,addDoc } from 'firebase/firestore';
+// const questions = require("@/app/mcq/question.json");
 
 import { useRouter } from 'next/navigation';
 const QuizPage = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(1200);
   const [questionsCorrect, setQuestionsCorrect] = useState([]);
-
+  const [incorrectQuestion,setIncorrectQuestion] = useState([]);
+const [loading,setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
         try {
             const querySnapshot = await getDocs(collection(db, 'quizzes')); 
             const fetchedData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setData(fetchedData);
-            console.log(fetchedData);
+            setData(fetchedData[0]);
+        
+            console.log(fetchedData[0]);
         } catch (err) {
             console.error(err);
-        } 
+        } finally {
+            console.log("Data fetched successfully");
+            setLoading(false);
+          }
     };
 
     fetchData();
@@ -49,7 +54,7 @@ const QuizPage = () => {
 
   const handleNextQuestion = () => {
     if (selectedAnswer !== null) {
-      if (selectedAnswer.includes(questions[currentQuestionIndex].answer)) {
+      if (selectedAnswer.includes(data.questions[currentQuestionIndex].answer)) {
         setScore((score)=>score + 1);
         setQuestionsCorrect((questionsCorrect) => [...questionsCorrect, currentQuestionIndex]);
       }
@@ -67,31 +72,36 @@ const QuizPage = () => {
   };
 
   return (
+
     <div className="h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100 flex items-center justify-center px-4">
+      
+      {loading && <div>Loading...</div>}
+      {!loading &&
       <div className="w-[80%] h-[90vh] flex flex-col">
         <QuizHeader 
           title="Operating System" 
-          noOfQuestions={questions.length} 
+          noOfQuestions={data.questions.length} 
           time={formatTime(timeRemaining)}
         />
         <QuizProgress 
           current={currentQuestionIndex } 
-          total={questions.length}
+          total={data.questions.length}
         />
-        {currentQuestionIndex < questions.length ? (
+        {currentQuestionIndex < data.questions.length ? (
           <QuizQuestion
             questionNo={currentQuestionIndex + 1}
-            question={questions[currentQuestionIndex].question}
-            options={questions[currentQuestionIndex].options}
+            question={data.questions[currentQuestionIndex].question}
+            options={data.questions[currentQuestionIndex].options}
             selectedAnswer={selectedAnswer}
             setSelectedAnswer={setSelectedAnswer}
             onNext={handleNextQuestion}
             
           />
         ) : (
-          <QuizResult questionsCorrect={questionsCorrect}score2={score} total={questions.length} restartQuiz={handleRestartQuiz}/>
+          <QuizResult quiz={data} setIncorrectQuestion={setIncorrectQuestion} incorrectQuestion ={incorrectQuestion} data={data} questionsCorrect={questionsCorrect} score2={score} total={data.questions.length} restartQuiz={handleRestartQuiz}/>
         )}
       </div>
+}
     </div>
   );
 };
@@ -178,12 +188,107 @@ const QuizQuestion = ({
   };
   
 
-const QuizResult = ({ score2, total,questionsCorrect,restartQuiz }) => {
+const QuizResult = ({ score2, total,questionsCorrect,restartQuiz,data,incorrectQuestion,setIncorrectQuestion,quiz }) => {
   const router = useRouter();
+  const [correctQuestions,setCorrectQuestions] = useState([]);
+  const [incorrectQuestions,setIncorrectQuestions] = useState([]);
+  const [loading,setLoading] = useState(false);
+  const [error,setError] = useState(null);
+  // const [quizAnalysis,setQuizAnalysis] = useState(null);
   const handleAnalysis = () => {
-    <QuizAnalysis />
+    // router.push(`/quiz-analysis/${data.id}`);
+    console.log("Correct Questions are ",questionsCorrect);
+    console.log("Incorrect Questions are ",incorrectQuestion);
+    const correctQuestions2 = questionsCorrect.map((question) => data.questions[question]);
+    const incorrectQuestions2 = incorrectQuestion.map((question) => data.questions[question]);
+    setCorrectQuestions(correctQuestions);
+    setIncorrectQuestions(incorrectQuestions);
+    const quizName = data.name;
+    const noOfQuestions = data.questions.length;
+    setLoading(true);
+    setError(null);
+ 
+      // store quiz analysis data on firebase
+
+      /* storeQuizAnalysis data on firebase */
+      
+        const handleQuizAnalysis = async (quizAnalysis) => {
+            try {
+              console.log("Storing Quiz Analysis data");
+              console.log("Correct Questions are ",correctQuestions2);
+              console.log("Incorrect Questions are ",incorrectQuestions2);
+              console.log("Quiz Name is ",quizName);
+                const docRef = await addDoc(collection(db, "quiz-analysis"), quizAnalysis);
+                console.log("Document written with ID: ", docRef.id);
+                router.push(`/quiz-analysis/${docRef.id}`);
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            } finally {
+                console.log("Quiz Analysis data stored successfully");
+            }
+        }
+        
+ 
+    const QuizAnalysis = async () => {
+      
+            // Prepare the request payload
+            const requestBody = {
+                "quiz":quizName,
+                "no_of_questions":noOfQuestions,
+                "correct_questions": correctQuestions2,
+                "incorrect_questions": incorrectQuestions2,
+            };
+
+            try {
+                const response = await fetch(
+                    "http://localhost:5000/analyze_quiz",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(requestBody),
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to generate questions.");
+                }
+
+                const data = await response.json();
+                console.log(data);
+                handleQuizAnalysis(data);
+                // Assuming you have setQuestions in your state
+                return;
+            } catch (error) {
+                console.error(error.message);
+              setError(error.message);
+
+            } finally {
+              setLoading(false);
+          }
+        }
+        QuizAnalysis();
+  }
+
+  useEffect(() => {
+    // console.log(questionsCorrect);
+    handleIncorrectQuestion();
+  },[]);
+  const handleIncorrectQuestion = () => {
+    setIncorrectQuestion(data.questions.map((question,index) => {
+      if(!questionsCorrect.includes(index)){
+        return index;
+      }
+    }
+    ));
   }
   return (
+    <>
+    {loading && <div>Loading...</div>}
+    {!loading &&
+
+   
     <div className="bg-gray-800 shadow-lg rounded-lg p-6 text-center flex-grow flex flex-col justify-center">
       <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
       <p className="text-lg mb-4">Your score: {score2} out of {total}</p>
@@ -191,17 +296,19 @@ const QuizResult = ({ score2, total,questionsCorrect,restartQuiz }) => {
         {score2 === total ? "Perfect Score!" : score2 > total / 2 ? "Great Job!" : `Keep Practicing!`}
         
       </p>
-      <p className="text-gray-100 text-sm mb-6">Correct Questions are {questionsCorrect.map((question) => question).join(",")}</p>
-      <p className="text-gray-100 text-sm mb-6">Incorrect Correct Questions are {questions.map((question,index)=>{console.log("Incorrect Questions ",index); return (index!=questionsCorrect.map(index=>{console.log(index);return index }))?index:""}).join(" ")}</p>
-      <button className="bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ease-in-out mx-auto"
+      {/* <p className="text-gray-100 text-sm mb-6">Correct Questions are {questionsCorrect.map((question) => question).join(",")}</p> */}
+      {/* <p className="text-gray-100 text-sm mb-6">Incorrect Correct Questions are {incorrectQuestion} </p> */}
+      <button className="bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ase-in-out mx-auto"
       onClick={restartQuiz}>
         Restart Quiz
       </button>
-      <button className="bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ease-in-out mx-auto"
-      onClick={router.push("/quiz-analysis")}>
+      <button className="bg-yellow-400 mt-5 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ease-in-out mx-auto"
+      onClick={handleAnalysis}>
         View Analysis
       </button>
     </div>
+  }
+  </>
   );
 };
 
