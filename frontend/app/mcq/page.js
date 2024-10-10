@@ -22,9 +22,9 @@ const [loading,setLoading] = useState(true);
         try {
             const querySnapshot = await getDocs(collection(db, 'quizzes')); 
             const fetchedData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setData(fetchedData[0]);
+            setData(fetchedData[3]);
         
-            console.log(fetchedData[0]);
+            console.log(fetchedData[1]);
         } catch (err) {
             console.error(err);
         } finally {
