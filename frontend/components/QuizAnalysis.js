@@ -42,7 +42,7 @@ const quizResults = {
   "Total Incorrect Answers": 5
 };
 
-export default function QuizAnalysis() {
+export default function QuizAnalysis({quiz}) {
   const accuracyData = {
     labels: Object.keys(quizResults["Accuracy by Difficulty"]),
     datasets: [
