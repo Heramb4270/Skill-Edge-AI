@@ -7,7 +7,7 @@ import { collection, getDocs,addDoc } from 'firebase/firestore';
 // const questions = require("@/app/mcq/question.json");
 
 import { useRouter } from 'next/navigation';
-const QuizPage = () => {
+const QuizPage = ({params}) => {
   const [data, setData] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -17,24 +17,31 @@ const QuizPage = () => {
   const [incorrectQuestion,setIncorrectQuestion] = useState([]);
 const [loading,setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-        try {
-            const querySnapshot = await getDocs(collection(db, 'quizzes')); 
-            const fetchedData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setData(fetchedData[3]);
-        
-            console.log(fetchedData[1]);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            console.log("Data fetched successfully");
-            setLoading(false);
-          }
-    };
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const quizDoc = db.collection("quizzes").doc(params.id);
+      quizDoc.onSnapshot((doc) => {
+        if (doc.exists) {
+          const data2 = doc.data();
+          setData(data2);  // Directly set the document data
 
-    fetchData();
-}, []);
+          console.log("Data inside onSnapshot: ", data2); // This logs the new data immediately
+          setLoading(false);
+        } else {
+          console.error("No such document!");
+        }
+      });
+    } catch (err) {
+      console.error("Error fetching quiz:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [params.id]);
+
   const handleRestartQuiz = () => {
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
@@ -76,10 +83,11 @@ const [loading,setLoading] = useState(true);
     <div className="h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100 flex items-center justify-center px-4">
       
       {loading && <div>Loading...</div>}
-      {!loading &&
+      {!loading && data!=null &&
       <div className="w-[80%] h-[90vh] flex flex-col">
+      { console.log("Hello")}
         <QuizHeader 
-          title="Operating System" 
+          title={"Temp Name"} 
           noOfQuestions={data.questions.length} 
           time={formatTime(timeRemaining)}
         />

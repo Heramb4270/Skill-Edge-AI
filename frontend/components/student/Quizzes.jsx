@@ -2,8 +2,9 @@
 import { useEffect, useState } from "react";
 import { db } from "@/firebase/db";
 import { MdQuiz } from "react-icons/md";
-
+import { useRouter } from "next/navigation";
 export default function Quizzes() {
+    const router = useRouter();
     const [quizzes, setQuizzes] = useState([]);
 
     useEffect(() => {
@@ -34,7 +35,9 @@ export default function Quizzes() {
         };
         fetchQuizzes();
     }, []);
-
+    // const handleGiveTest = ()=>{
+    //     router.push("/student/give-test");
+    // }
     return (
         <div className="bg-white dark:bg-gray-800 text-black dark:text-white p-4 rounded-lg">
             <h1 className="text-2xl font-bold">Quizzes</h1>
@@ -54,7 +57,8 @@ export default function Quizzes() {
                             <button
                                 type="button"
                                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                            >
+                                onClick={() => router.push(`/mcq/${quiz.id}`)}
+                           >
                                 Give Test
                             </button>
                            
