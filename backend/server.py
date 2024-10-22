@@ -43,6 +43,62 @@ def generate_question():
 
     return jsonify(questions)
 
+
+
+@app.route('/analyze_quiz', methods=['POST'])
+def analyzequiz():
+    data = request.json
+    quiz = data['quiz']
+    correct = data['correct_questions']
+    incorrect = data['incorrect_questions']
+    no_of_questions = data['no_of_questions']
+
+    genai.configure(api_key=API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+
+    analysis = model.generate_content(f"""
+    You are given the following inputs on Quiz of {quiz}:
+
+    Correctly Answered Questions: An array of text containing questions that were answered correctly.
+    Incorrectly Answered Questions: An array of text containing questions that were answered incorrectly.
+    
+    Total Number of Questions: The total number of questions in the quiz.
+                                        
+    Your task is to analyze the quiz performance based on the inputs and provide the following details in JSON format:
+
+    Total Correct Answers: Number of questions answered correctly.
+    Total Incorrect Answers: Number of questions answered incorrectly.
+    Correct by Difficulty: A breakdown of how many questions were answered correctly for each difficulty level (easy, medium, hard).
+    Incorrect by Difficulty: A breakdown of how many questions were answered incorrectly for each difficulty level (easy, medium, hard).
+    Accuracy by Difficulty: The percentage of correct answers for each difficulty level (easy, medium, hard).
+    Overall Accuracy: The percentage of total correct answers out of the total number of questions.
+    Weakness Areas: Topics where user is weak
+    Strength Areas:  Topics where user is strong
+    Strengths: Identify the topics in which the user performed well based on the correctly answered questions.
+    Weaknesses: Identify the topics where the user struggled, based on the incorrectly answered questions.
+    Suggested Topics to Focus On: Suggest topics for further practice, emphasizing those where the user answered incorrectly or showed lower accuracy.
+    References: Provide references to study materials or resources for the suggested topics and also inside reference give two outputs 1.books and 2.online resources .
+    Suggestion_For_Improvement: Provide suggestions for improvement based on the analysis of the quiz performance .
+    Please provide the output in the following JSON format 
+    correct_questions = {correct}
+    incorrect_questions = {incorrect}
+    no_of_questions = {no_of_questions}
+    ** Important ** Dont give Explaination and Important Note At All i am using this output to print the result in my app.
+    ** Important ** Everything should be in JSON format. either in single quotes or double quotes. dont highlight the title with double quotes in books .
+    for example "Artificial Intelligence: A Modern Approach" by Stuart Russell and Peter Norvig" should be in single quotes.
+    i should not get json error. while printing the output in my app.
+    """)
+                            
+    print(analysis.text)
+    str = analysis.text
+    str = str.replace('```json', '')
+    str = str.replace('```', '')
+    str = str.strip()
+    questions = json.loads(str)
+    print(questions)
+
+    return jsonify(questions)
+
 @app.route('/generate_question_by_file', methods=['POST'])
 def generate_question_by_file():
     # Check if a file is provided and it's a PDF

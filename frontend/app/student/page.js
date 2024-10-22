@@ -1,14 +1,16 @@
 "use client";
 import {useState} from 'react'
-import SideBar from '@/components/admin/SideBar'
-import Dashboard from '@/components/admin/Dashboard'
-import GenerateQuestion from '@/components/admin/GenerateQuestion'
-import StudentList from '@/components/admin/StudentList'
-import Resource from '@/components/admin/Resource'
-import Quizzes from '@/components/admin/Quizzes';
+import SideBar from '@/components/student/SideBar'
+import Dashboard from '@/components/student/Dashboard'
+import GenerateQuestion from '@/components/student/GenerateQuestion'
+import StudentList from '@/components/student/StudentList'
+import Resource from '@/components/student/Resource'
+import Quizzes from '@/components/student/Quizzes';
 
 export default function page() {
   const [tab, setTab] = useState('dashboard')
+
+  
   return (
     <div>
         <SideBar tab={tab} setTab={setTab}>

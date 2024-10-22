@@ -11,7 +11,7 @@ export default function UploadResources() {
   const [file, setFile] = useState(null);
   const [link, setLink] = useState("");
   const [name, setName] = useState("");
-  const [tab, setTab] = useState("upload");
+  const [tab, setTab] = useState("view");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resources, setResources] = useState([]);
@@ -91,7 +91,7 @@ export default function UploadResources() {
 
       <div className="border-b border-gray-200 dark:border-gray-700 mb-4">
         <ul className="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
-          <li className="me-2">
+          {/* <li className="me-2">
             <a
               href="#"
               className={`inline-flex items-center justify-center p-4 border-b-2 ${
@@ -110,7 +110,7 @@ export default function UploadResources() {
               />
               Upload Resources
             </a>
-          </li>
+          </li> */}
           <li className="me-2">
             <a
               href="#"
