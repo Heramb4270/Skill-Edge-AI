@@ -183,7 +183,6 @@ def generate_question_theory():
     questions = json.loads(str)
 
     print(questions)
-
     return jsonify(questions)
 
 
