@@ -43,8 +43,9 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
 //   "Total Incorrect Answers": 5
 // };
 
-export default function QuizAnalysis({analysis}) {
-  const [Primaryanalysis,setPrimaryAnalysis] = useState(analysis[0]);
+export default function QuizAnalysis({analysis,setAnalysis}) {
+  console.log(analysis);
+  const [Primaryanalysis,setPrimaryAnalysis] = useState(analysis);
   const accuracyData = {
     labels: Object.keys(Primaryanalysis["Accuracy by Difficulty"]),
     datasets: [
@@ -106,7 +107,7 @@ export default function QuizAnalysis({analysis}) {
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-5 space-y-2">
-              {Primaryanalysis.Strengths.map((strength, index) => (
+              {Primaryanalysis.Strengths?.map((strength, index) => (
                 <li key={index}>{strength}</li>
               ))}
             </ul>
@@ -119,7 +120,7 @@ export default function QuizAnalysis({analysis}) {
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-5 space-y-2">
-              {Primaryanalysis.Weaknesses.map((weakness, index) => (
+              {Primaryanalysis.Weaknesses?.map((weakness, index) => (
                 <li key={index}>{weakness}</li>
               ))}
             </ul>
@@ -145,7 +146,7 @@ export default function QuizAnalysis({analysis}) {
             <div>
               <h3 className="font-semibold mb-2">Books:</h3>
               <ul className="list-disc pl-5 space-y-1">
-                {Primaryanalysis.References.books.map((book, index) => (
+                {Primaryanalysis.References.books?.map((book, index) => (
                   <li key={index}>{book}</li>
                 ))}
               </ul>
@@ -153,7 +154,7 @@ export default function QuizAnalysis({analysis}) {
             <div>
               <h3 className="font-semibold mb-2">Online Resources:</h3>
               <ul className="list-disc pl-5 space-y-1">
-                {Primaryanalysis.References["online resources"].map((resource, index) => (
+                {Primaryanalysis.References["online resources"]?.map((resource, index) => (
                   <li key={index}>
                     <a href={resource} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                       {resource}
@@ -169,7 +170,7 @@ export default function QuizAnalysis({analysis}) {
       <div className="flex justify-center">
       <button 
             className="bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ease-in-out flex items-center"
-            
+            onClick={() => setAnalysis(false)}
           >
             Retake Quiz
             <ChevronRight className="w-5 h-5 ml-2" />
