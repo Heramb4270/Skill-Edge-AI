@@ -51,7 +51,7 @@ export default function GenerateQuestion() {
 
                 try {
                     const response = await fetch(
-                        "http://localhost:5000/generate_question_topics",
+                        "http://localhost:5000/generate_mcq_question_multiple_topics",
                         {
                             method: "POST",
                             headers: {

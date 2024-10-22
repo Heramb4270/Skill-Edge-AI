@@ -39,11 +39,9 @@ def generate_question():
     str = str.strip()
     questions = json.loads(str)
 
-    print(questions)
+    print("Generated questions:", questions)
 
     return jsonify(questions)
-
-
 
 @app.route('/analyze_quiz', methods=['POST'])
 def analyzequiz():
@@ -163,27 +161,67 @@ def generate_question_by_file():
         return jsonify({'error': 'Failed to decode questions'}), 500
 
     return jsonify(questions)
-    
-@app.route('/generate_question_theory', methods=['POST'])
-def generate_question_theory():
+
+@app.route('/generate_mcq_question_multiple_topics', methods=['POST'])
+def generate_mcq_question_multiple_topics():
     data = request.json
-    topic = data['topic']
-    no_of_questions = data['no_of_questions']
-    difficulty = data['difficulty']
+    print("Received data:", data)  # Debugging line
+
+    # Check for required keys
+    if 'topics' not in data or not isinstance(data['topics'], list):
+        return jsonify({"error": "'topics' key is missing or is not an array."}), 400
+
+    if 'difficultyLevel' not in data:
+        return jsonify({"error": "'difficultyLevel' key is missing."}), 400
+
+    topics = data['topics']
+    difficulty = data['difficultyLevel']  # Expecting 'difficultyLevel'
 
     genai.configure(api_key=API_KEY)
     model = genai.GenerativeModel("gemini-1.5-flash")
 
-    questions = model.generate_content(f"Generate {no_of_questions} thoery questions on {topic} with difficulty {difficulty}. Give me json output.  In the following format: \n\n[{{\n    \"qno\": 1,\n    \"question\": \"What is the capital of India?\",}},\n{{\n    \"qno\": 2,\n    \"question\": \"What is the capital of USA?\"}}]")
+    generated_questions = []
 
-    str = questions.text
-    str = str.replace('```json', '')
-    str = str.replace('```', '')
-    str = str.strip()
-    questions = json.loads(str)
+    for topic in topics:
+        topic_name = topic.get('topicName')
+        number_of_questions = topic.get('numberOfQuestions')
 
-    print(questions)
-    return jsonify(questions)
+        if topic_name is None or number_of_questions is None:
+            return jsonify({"error": "Each topic must have 'topicName' and 'numberOfQuestions'."}), 400
+
+        try:
+            questions = model.generate_content(
+                f"Generate {number_of_questions} MCQ questions on {topic_name} with difficulty {difficulty}. "
+                f"Give me json output in the following format: \n\n"
+                f"[{{\n    \"qno\": 1,\n    \"question\": \"What is the capital of India?\",\n    \"options\": [\"Mumbai\", \"Delhi\", \"Kolkata\", \"Chennai\"], \"answer\": \"Delhi\"}},\n"
+                f"{{\n    \"qno\": 2,\n    \"question\": \"What is the capital of USA?\",\n    \"options\": [\"Washington DC\", \"New York\", \"Los Angeles\", \"Chicago\"], \"answer\": \"Washington DC\"}}]"
+            )
+
+            # Print raw output from the AI model
+            str_questions = questions.text
+            print("Raw generated questions output:", str_questions)  # Debugging line
+            
+            # Clean up the response
+            str_questions = str_questions.replace('```json', '').replace('```', '').strip()
+            questions_json = json.loads(str_questions)
+
+            # Ensure that each question has the required fields
+            for question in questions_json:
+                if 'options' not in question:
+                    question['options'] = []  # Add an empty list or a default value
+                if 'answer' not in question:
+                    question['answer'] = "Not provided"  # Add a fallback answer
+
+                generated_questions.append(question)
+
+        except json.JSONDecodeError as json_error:
+            return jsonify({"error": f"Failed to decode JSON for topic '{topic_name}': {str(json_error)}"}), 500
+        except Exception as e:
+            return jsonify({"error": f"Error generating questions for topic '{topic_name}': {str(e)}"}), 500
+
+    print("Generated questions:", generated_questions)
+
+    return jsonify(generated_questions)
 
 
 if __name__ == '__main__':
