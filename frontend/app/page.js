@@ -3,7 +3,7 @@ import Card from "@/components/Card";
 import Footer from "@/components/Footer";
 import IntoBanner from "@/components/IntroBanner";
 // import NavBar from "@/components/user/Navbar";
-import Navbar from "@/components/user/navbar";
+import Navbar from "@/components/user/NavBar";
 import ProgressBar from "@/components/ProgressBar";
 import Title from "@/components/Title";
 import { useState, useEffect } from "react";

@@ -1,11 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { CodeXml, Timer, ChevronRight } from 'lucide-react';
-// import {QuizAnalysis} from "@/components/QuizAnalysis";
-// import {QuizAnalysis} from "@/components/QuizAnalysis";
-import QuizAnalysis from '@/components/QuizAnalysis'
-
-// import {quizAnalysis} from "@/components/QuizAnalysis"
+import {QuizAnalysis} from "@/components/QuizAnalysis";
 import { db } from '@/firebase/db'; // Adjust the path as needed
 import { collection, getDocs,addDoc } from 'firebase/firestore';
 // const questions = require("@/app/mcq/question.json");
@@ -16,8 +12,6 @@ const QuizPage = ({params}) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
-  const [IsAnalysisAvailable,setIsAnalysisAvailable] = useState(false);
-  const [analysis ,setAnalysis] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState(1200);
   const [questionsCorrect, setQuestionsCorrect] = useState([]);
   const [incorrectQuestion,setIncorrectQuestion] = useState([]);
@@ -26,7 +20,7 @@ const [loading,setLoading] = useState(true);
 useEffect(() => {
   const fetchData = async () => {
     try {
-      const quizDoc = db.collection("quizzes").doc(params.id);
+      const quizDoc = db.collection("student_quizzes").doc(params.id);
       quizDoc.onSnapshot((doc) => {
         if (doc.exists) {
           const data2 = doc.data();
@@ -85,9 +79,7 @@ useEffect(() => {
   };
 
   return (
-<>
-{IsAnalysisAvailable && <QuizAnalysis setAnalysis={handleRestartQuiz} analysis={analysis}/>}
-{!IsAnalysisAvailable &&
+
     <div className="h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100 flex items-center justify-center px-4">
       
       {loading && <div>Loading...</div>}
@@ -114,13 +106,11 @@ useEffect(() => {
             
           />
         ) : (
-          <QuizResult setQuizAnalysis={setAnalysis} setIsAnalysisAvailable={setIsAnalysisAvailable} quiz={data} setIncorrectQuestion={setIncorrectQuestion} incorrectQuestion ={incorrectQuestion} data={data} questionsCorrect={questionsCorrect} score2={score} total={data.questions.length} restartQuiz={handleRestartQuiz}/>
+          <QuizResult quiz={data} setIncorrectQuestion={setIncorrectQuestion} incorrectQuestion ={incorrectQuestion} data={data} questionsCorrect={questionsCorrect} score2={score} total={data.questions.length} restartQuiz={handleRestartQuiz}/>
         )}
       </div>
 }
     </div>
-}
-    </>
   );
 };
 
@@ -206,12 +196,11 @@ const QuizQuestion = ({
   };
   
 
-const QuizResult = ({ score2, total,questionsCorrect,restartQuiz,data,incorrectQuestion,setIncorrectQuestion,quiz, setIsAnalysisAvailable, setQuizAnalysis }) => {
+const QuizResult = ({ score2, total,questionsCorrect,restartQuiz,data,incorrectQuestion,setIncorrectQuestion,quiz }) => {
   const router = useRouter();
   const [correctQuestions,setCorrectQuestions] = useState([]);
   const [incorrectQuestions,setIncorrectQuestions] = useState([]);
   const [loading,setLoading] = useState(false);
-  // const [analysis,setAnalysis] = useState(false);
   const [error,setError] = useState(null);
   // const [quizAnalysis,setQuizAnalysis] = useState(null);
   const handleAnalysis = () => {
@@ -237,11 +226,9 @@ const QuizResult = ({ score2, total,questionsCorrect,restartQuiz,data,incorrectQ
               console.log("Correct Questions are ",correctQuestions2);
               console.log("Incorrect Questions are ",incorrectQuestions2);
               console.log("Quiz Name is ",quizName);
-              setIsAnalysisAvailable(true);
-              setQuizAnalysis(quizAnalysis);
                 const docRef = await addDoc(collection(db, "quiz-analysis"), quizAnalysis);
                 console.log("Document written with ID: ", docRef.id);
-                // router.push(`/quiz-analysis/${docRef.id}`);
+                router.push(`/quiz-analysis/${docRef.id}`);
             } catch (e) {
                 console.error("Error adding document: ", e);
             } finally {
@@ -306,7 +293,6 @@ const QuizResult = ({ score2, total,questionsCorrect,restartQuiz,data,incorrectQ
   }
   return (
     <>
-    {/* {analysis && <QuizAnalysis />} */}
     {loading && <div>Loading...</div>}
     {!loading &&
 
@@ -330,7 +316,6 @@ const QuizResult = ({ score2, total,questionsCorrect,restartQuiz,data,incorrectQ
       </button>
     </div>
   }
-    
   </>
   );
 };

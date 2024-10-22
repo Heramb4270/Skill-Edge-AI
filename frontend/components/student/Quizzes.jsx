@@ -15,29 +15,12 @@ export default function Quizzes() {
                 ...doc.data(),
             }));
             console.log(data);
-            // Output:
-            //             0
-            // :
-            // {id: 'J6YYcjtI6VQzZf0vFnAX', questions: Array(5), name: 'Computer Network Numerical'}
-            // 1
-            // :
-            // {id: 'X7WSOcW05KwntUYP05hK', questions: Array(2), name: 'gfhfghg'}
-            // 2
-            // :
-            // {id: 'alCCScdsmMDoH613YKDU', name: 'sdfsdf', questions: Array(2)}
-            // 3
-            // :
-            // {id: 'an7RHQqTY9Asam4pSw6k', questions: Array(6), name: 'Demo'}
-            // 4
-            // :
-            // {id: 'jlx7dGCWNNx9ffuWmZhM', name: 'Database Quiz', questions: Array(6)}
+           
             setQuizzes(data);
         };
         fetchQuizzes();
     }, []);
-    // const handleGiveTest = ()=>{
-    //     router.push("/student/give-test");
-    // }
+    
     return (
         <div className="bg-white dark:bg-gray-800 text-black dark:text-white p-4 rounded-lg">
             <h1 className="text-2xl font-bold">Quizzes</h1>
