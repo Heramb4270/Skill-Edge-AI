@@ -37,7 +37,7 @@ export default function page({params}) {
       data.push({ id: doc.id, ...doc.data() });
     });
     setLoading(false);
-    setAnalysis(data.filter((data)=>data.id == params.id));
+    setAnalysis(()=>data.filter((data)=>data.id == params.id));
     console.log("data is "+ data);
      // Data will be available as props in your component
   }
