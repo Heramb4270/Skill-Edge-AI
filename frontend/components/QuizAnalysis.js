@@ -45,7 +45,13 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
 
 export default function QuizAnalysis({analysis,setAnalysis}) {
   console.log(analysis);
-  const [Primaryanalysis,setPrimaryAnalysis] = useState(analysis[0]);
+  let analysis2;
+  if(Array.isArray(analysis)){
+     analysis2 = analysis[0]
+  }else{
+    analysis2 = analysis;
+  }
+  const [Primaryanalysis,setPrimaryAnalysis] = useState(analysis2);
   const accuracyData = {
     labels: Object.keys(Primaryanalysis["Accuracy by Difficulty"]),
     datasets: [
