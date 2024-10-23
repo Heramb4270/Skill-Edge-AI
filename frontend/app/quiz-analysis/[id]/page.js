@@ -17,7 +17,7 @@ export default function page({params}) {
   const fetchResources2 = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "quiz-analysis"));
-      const fetchedResources = querySnapshot.docs.map((doc) => doc);
+      const fetchedResources = querySnapshot.docs?.map((doc) => doc);
       setResources(fetchedResources);
       console.log(fetchedResources);
 
